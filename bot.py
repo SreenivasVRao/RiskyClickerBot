@@ -243,9 +243,6 @@ def main():
                 or (heroku and (mc.get(parent.id) is None))
             # Parse parent if it's local, and parent comment already not replied to.
             # Or parse if it's on heroku, and parent comment is not in memcache
-            print (heroku)
-            if (mc.get(parent.id) is None):
-                print (parent.id)
 
             if parse:
                 if not comment.is_root:
