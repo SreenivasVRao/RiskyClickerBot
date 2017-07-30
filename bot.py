@@ -112,7 +112,7 @@ def parse_comment(reddit_comment, root=False):
         #Add the remaining text.
 
         bottom_text = '\n \n ___ \n \n ^^Am ^^I ^^broken? [^^Contact ^^the ^^Developer](/u/PigsDogsAndSheep)'+ \
-                      ' ^^| [^^Source ^^Code](http://github.com/)'+ \
+                      ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)'+ \
                       '\n \n ^^If ^^I ^^analyzed ^^your ^^parent ^^comment ^^already, ' + \
                       '^^I ^^won\'t ^^reply ^^to ^^you. ^^I ^^also ^^won\'t ^^process ^^more ^^than ^^6 ^^URLS '+ \
                       '^^per ^^parent ^^due ^^to ^^API ^^restrictions.'
