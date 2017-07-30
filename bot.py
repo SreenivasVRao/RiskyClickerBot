@@ -1,3 +1,4 @@
+from __future__ import print_function
 import praw, json, re
 from imgurpython import ImgurClient
 from imgurpython.helpers import error
@@ -98,9 +99,9 @@ def parse_comment(reddit_comment, root=False):
                 indices.append(next)
                 current_idx = next
             else:
-                print each_url
-                print type(result)
-                print result
+                print (each_url)
+                print (type(result))
+                print (result)
 
         current_idx = 0
         bot_reply = ''
@@ -150,9 +151,9 @@ def handle_link(link, linktype):
                 else:
                     message = '(Album contained no images to process.)'
 
-            except error.ImgurClientError, e:
+            except error.ImgurClientError as e:
                 message = 'Not able to fetch the album.'
-                print e.error_message
+                print (e.error_message)
 
     elif linktype == 'gallery':
         item_id = link.split('/')[-1]
@@ -167,8 +168,8 @@ def handle_link(link, linktype):
             try:
                 image = imgurbot.get_image(image_id)
                 status, message = handle_link(image.link, 'imgur_image')
-            except error.ImgurClientError, e:
-                print e.error_message
+            except error.ImgurClientError as e:
+                print (e.error_message)
                 status = None
 
         elif '#' not in item_id:
@@ -177,14 +178,14 @@ def handle_link(link, linktype):
 
                 status, message = handle_link(album.link, 'album')
 
-            except error.ImgurClientError, e:
+            except error.ImgurClientError as e:
                 try:
                     image = imgurbot.get_image(item_id)
 
                     status, message = handle_link(image.link, 'imgur_image')
 
-                except error.ImgurClientError,e:
-                    print e.error_message
+                except error.ImgurClientError as e:
+                    print (e.error_message)
                     message = 'Broken Link.'
 
     elif linktype == 'imgur_image':
@@ -251,8 +252,8 @@ def main():
                     botreply = parse_comment(submission, root=True)
                 try:
                     comment.reply(botreply)
-                except APIException, a:
-                    print a.message, a.error_type
+                except APIException as a:
+                    print (a.message, a.error_type)
 
             if heroku:
                 mc_keys.append(parent.id)
@@ -269,7 +270,7 @@ def main():
     elif heroku:
         for each in mc_keys:
             mc.set(each, 'TRUE')
-    print "Done."
+    print ("Done.")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

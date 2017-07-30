@@ -1,3 +1,4 @@
+from __future__ import print_function
 from clarifai.rest import ClarifaiApp
 import os
 
@@ -34,4 +35,4 @@ elif __name__ == '__main__':
     app= launch_app()
 
     answer = get_predictions(['http://imgur.com/JlVKy4W.jpg'])
-    print answer
+    print (answer)
