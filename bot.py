@@ -298,7 +298,7 @@ def main():
                     each.mark_read()
                 else:
                     break
-
+        print (n)
     if not heroku:
         with open("posts_replied_to.p", "wb") as f:
             pickle.dump(posts_replied_to, f)
