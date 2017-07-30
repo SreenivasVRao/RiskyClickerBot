@@ -1,0 +1,25 @@
+Handle gfycat links.
+Handle streamable links.
+Handle youtube links.
+Handle gifs.
+Handle twitter image links.
+Handle google image links.
+Support arguments in comment body.
+
+TESTS:
+
+# imgur.com/a/<id>#<id>
+# imgur.com/gallery/<id> (image id)
+# broken link for each
+# imgur.com/imageid
+# album, two images, gallery in one comment
+# top level comment
+# child comment
+# child comment on previously replied parent.
+
+
+
+# format bot reply better.
+# regex corner cases?
+
+#incorporate memcached.
