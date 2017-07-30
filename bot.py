@@ -244,7 +244,9 @@ def main():
             # Parse parent if it's local, and parent comment already not replied to.
             # Or parse if it's on heroku, and parent comment is in memcache
             print (heroku)
-            print (mc.get(parent.id) is not None)
+            if (mc.get(parent.id) is None):
+                print (parent.id)
+
             if parse:
                 if not comment.is_root:
                     botreply = parse_comment(parent)
