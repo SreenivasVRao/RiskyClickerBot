@@ -270,6 +270,7 @@ def main():
     elif heroku:
         for each in mc_keys:
             mc.set(each, 'TRUE')
+            print ("Ran Heroku Scheduler successfully.")
     print ("Done.")
 
 if __name__ == '__main__':
