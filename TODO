@@ -21,4 +21,4 @@ TESTS:
 
 # format bot reply better.
 # regex corner cases?
-#incorporate memcached.
+# use tinyDB for local.
