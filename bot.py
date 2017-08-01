@@ -107,9 +107,9 @@ def parse_comment(reddit_comment, root=False):
                 nsfwaverage = nsfwtotal * 100 / len(result.items())
 
                 if sfwaverage > nsfwaverage:
-                    insert_text.append(" ** SFW (I'm {0:.2f}% confident) ** ".format(sfwaverage))
+                    insert_text.append(" **SFW (I'm {0:.2f}% confident)** ".format(sfwaverage))
                 else:
-                    insert_text.append(" ** NSFW (I'm {0:.2f}% confident) ** ".format(sfwaverage))
+                    insert_text.append(" **NSFW (I'm {0:.2f}% confident)** ".format(sfwaverage))
 
             elif result is None and link_type is None:
                 failures += 1
