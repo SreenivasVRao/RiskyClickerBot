@@ -72,9 +72,15 @@ def parse_comment(reddit_comment, root=False):
     bot_reply = None
     with open('blacklist.json', 'rb') as f:
         blacklist = json.load(f)
+    if root:
+        sub = reddit_comment.permalink.split('/')[2].lower()
+    else:
+        sub = reddit_comment.permalink().split('/')[2].lower()
+    # Bleddy PRAW has a weird kink. Submission objects have permalink as an attribute
+    # Comments have permalink as a function
 
-    sub = reddit_comment.permalink().split('/')[2].lower()
     subreddit = redditbot.subreddit(sub)
+
 
     if sub not in blacklist['disallowed'] and not subreddit.over18:
         # not checking NSFW subreddits because that's dumb
@@ -263,7 +269,7 @@ def ensure_extension(link):
         return link
 
 
-def get_comment(new_comment, new_parent):
+def generate_bot_comment(new_comment, new_parent):
     id = None
     if not new_comment.is_root:
         botreply = parse_comment(new_parent)
@@ -293,9 +299,8 @@ def check_mentions(memcache):
             parse = (memcache.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
             # parse if not in cache
             # parse if bot is not author
-
             if parse:
-                id = get_comment(new_comment=comment, new_parent=parent)
+                id = generate_bot_comment(new_comment=comment, new_parent=parent)
                 if id is not None:
                     memcache.set(id, 'T')
 
@@ -331,10 +336,12 @@ def main():
 
     # heroku is a flag - set to True if running from that platform
 
+    # subreddit = redditbot.subreddit('all')
     subreddit = redditbot.subreddit('all')
 
     for n, comment in enumerate(subreddit.stream.comments()):
         if 'risky click' in comment.body.lower():
+            print ('Permalink is', comment.permalink())
             parent = comment.parent()
             parse = (mc.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
 
@@ -342,9 +349,11 @@ def main():
             # and if the parent comment is not by this bot
 
             if parse:
-                id = get_comment(new_comment=comment, new_parent=parent)
+                id = generate_bot_comment(new_comment=comment, new_parent=parent)
                 if id is not None:
                     mc.set(parent.id, 'T')
+            else:
+                print (parent.author, mc.get(parent.id))
 
         elif n % 5000 == 0:
             mc = check_mentions(mc)
