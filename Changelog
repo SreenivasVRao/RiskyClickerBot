@@ -1,0 +1,8 @@
+# 1 August 2017
+> Fixed bug in markup handling.
+> Fixed bug that allowed bot to post to subs where bots are disallowed.
+> Fixed bug that allowed bot to recursively comment on its own analysis.
+> Added better handling of multiline comments.
+> Improved bot functioning from a local system. Bot now uses a memcache on local system as well as on Heroku.
+  Previously, locally running bot would use a list which would never save to disk.
+> Moved bot version to 1.1.

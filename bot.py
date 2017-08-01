@@ -11,6 +11,9 @@ import argparse
 
 global imgurbot, redditbot, message, heroku
 
+markupregex = re.compile("( )*http.+\)", re.S)
+newlineregex = re.compile("\n\n")
+
 
 def imgur_init():
 
@@ -54,6 +57,15 @@ def url_analyzer(link):
         return None
 
 
+def get_markup_offset(text):
+    x = re.search(markupregex, text)
+
+    if x is not None:
+        return x.endpos
+    else:
+        return 0
+
+
 def parse_comment(reddit_comment, root=False):
 
     global redditbot
@@ -61,7 +73,7 @@ def parse_comment(reddit_comment, root=False):
     with open('blacklist.json', 'rb') as f:
         blacklist = json.load(f)
 
-    sub = reddit_comment.permalink().split('/')[2]
+    sub = reddit_comment.permalink().split('/')[2].lower()
     subreddit = redditbot.subreddit(sub)
 
     if sub not in blacklist['disallowed'] and not subreddit.over18:
@@ -73,7 +85,6 @@ def parse_comment(reddit_comment, root=False):
         regexp = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+[#0-9A-Za-z]+'
         urls = re.findall(regexp, data)
         # Mainly based on https://stackoverflow.com/a/6883094
-
         indices = []
         insert_text = []
         current_idx = 0
@@ -81,7 +92,6 @@ def parse_comment(reddit_comment, root=False):
 
         failures = 0
         for each_url in urls[0:6]:
-
             link_type = url_analyzer(each_url)
 
             result, bot_msg = handle_link(each_url, link_type)
@@ -97,10 +107,15 @@ def parse_comment(reddit_comment, root=False):
                 failures += 1
                 insert_text.append(' **(Could not process this link.)** ')
 
-            next = data[current_idx:].find(each_url) + len(each_url) + len(data[0:current_idx])
-            if next < len(data) and data[next] == ')':
-                #accounting for reddit markup
-                next += 1
+            url_start_idx = data[current_idx:].find(each_url)
+
+
+            next = len(data[0:current_idx]) + url_start_idx + len(each_url)
+
+            next += get_markup_offset(data[url_start_idx:])
+            # if next < len(data) and data[next] == ')':
+            #     #accounting for reddit markup
+            #     next += 1
 
             indices.append(next)
             current_idx = next
@@ -115,18 +130,41 @@ def parse_comment(reddit_comment, root=False):
             bot_reply += data[current_idx:]
             #Add the remaining text.
 
-            bottom_text = '\n \n ___ \n \n ^^Am ^^I ^^broken? [^^Contact ^^the ^^Developer](/u/PigsDogsAndSheep)'+ \
-                          ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)'+ \
-                          '\n \n ^^If ^^I ^^analyzed ^^your ^^parent ^^comment ^^already, ' + \
-                          '^^I ^^won\'t ^^reply ^^to ^^you. ^^I ^^also ^^won\'t ^^process ^^more ^^than ^^6 ^^URLS '+ \
+            bottom_text = '\n \n ___' + \
+                          '\n\n^^*RiskyClickerBot* ^^*v1.1*' + \
+                          '\n\n ^^Am ^^I ^^broken? [^^Contact ^^the ^^Developer](/u/PigsDogsAndSheep)' + \
+                          ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
+                          '\n\n ^^You ^^can ^^summon ^^me ^^too. [^^Example](http://imgur.com/TsvwFht) ' + \
+                          '\n\n ^^I ^^reply ^^once ^^per ^^parent ^^comment. ^^I ^^also ^^won\'t ^^process ^^more ^^than ^^6 ^^URLS ' + \
                           '^^per ^^parent ^^due ^^to ^^API ^^restrictions.'
 
-            bot_reply = '>' + bot_reply + bottom_text
+            bot_reply = handle_multiline_comment(bot_reply)
+            bot_reply = bot_reply + bottom_text
+            print (bot_reply)
+            exit(0)
 
         else:
             bot_reply = None
 
     return bot_reply
+
+
+def handle_multiline_comment(text):
+    matches_iterator = re.finditer(newlineregex, text)
+
+    fragments = []
+    prev = 0
+
+    for n, m in enumerate(matches_iterator):
+        fragments.append('>' + text[prev:m.start()])
+        prev = m.end()
+
+    fragments.append('>' + text[prev:])  # leftover text
+    result = '>'
+    for f in fragments:
+        result += '\n\n' + f
+
+    return result
 
 
 def handle_link(link, linktype):
@@ -239,76 +277,81 @@ def get_comment(new_comment, new_parent):
     return id
 
 
-def main():
-    global redditbot, location
+def check_mentions(memcache):
+    global redditbot
+    mail = redditbot.inbox
+    summons = mail.mentions(limit=30)
 
-    mc = None #will be memcache client if running app from heroku
-    posts_replied_to = []
-    mc_keys = []
-    if not heroku and os.path.exists("posts_replied_to.p"):
-        # Read local file into a list and remove any empty values
-        with open("posts_replied_to.p", "rb") as f:
-            posts_replied_to = pickle.load(f)
-            posts_replied_to = list(filter(None, posts_replied_to))
+    for each in summons:
+        if each.new:
+            comment = redditbot.comment(id=each.id)
+            parent = comment.parent()
+            parse = (memcache.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
+            # parse if not in cache
+            # parse if bot is not author
 
-    elif heroku:
+            if parse:
+                id = get_comment(new_comment=comment, new_parent=parent)
+                if id is not None:
+                    memcache.set(each, 'T')
+
+            each.mark_read()
+        else:
+            break
+
+    return memcache
+
+
+def get_memcache_client(herokuFlag=False):
+    # Store IDs of comments that the bot has already replied to.
+    # Read local cache by default
+
+    MEMCACHEDCLOUD_SERVERS = '127.0.0.1:11211'
+    MEMCACHEDCLOUD_USERNAME = 'user'
+    MEMCACHEDCLOUD_PASSWORD = 'password'
+
+    if heroku:
         MEMCACHEDCLOUD_SERVERS = os.environ.get('MEMCACHEDCLOUD_SERVERS')
         MEMCACHEDCLOUD_USERNAME = os.environ.get('MEMCACHEDCLOUD_USERNAME')
         MEMCACHEDCLOUD_PASSWORD = os.environ.get('MEMCACHEDCLOUD_PASSWORD')
 
-        mc = bmemcached.Client((MEMCACHEDCLOUD_SERVERS,), MEMCACHEDCLOUD_USERNAME,
-                               MEMCACHEDCLOUD_PASSWORD)
+    client = bmemcached.Client((MEMCACHEDCLOUD_SERVERS,), MEMCACHEDCLOUD_USERNAME,
+                           MEMCACHEDCLOUD_PASSWORD)
+    return client
+
+
+def main():
+    global redditbot, location
+
+    mc = get_memcache_client(heroku)
+
+    # heroku is a flag - set to True if running from that platform
 
     subreddit = redditbot.subreddit('all')
 
     for n, comment in enumerate(subreddit.stream.comments()):
         if 'risky click' in comment.body.lower():
             parent = comment.parent()
-            parse = ((not heroku) and (parent.id not in posts_replied_to)) \
-                or (heroku and (mc.get(parent.id) is None))
+            parse = (mc.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
+
+            # If the parent is not already replied to
+            # and if the parent comment is not by this bot
+
             if parse:
                 id = get_comment(new_comment=comment, new_parent=parent)
                 if id is not None:
-                    if heroku:
-                        mc.set(parent.id, 'T')
-                    else:
-                        posts_replied_to.append(parent.id)
+                    mc.set(parent.id, 'T')
 
         elif n % 5000 == 0:
+            mc = check_mentions(mc)
             # Check inbox for mentions every 5000 comments.
-            mail = redditbot.inbox
-            summons = mail.mentions(limit=30)
-            for each in summons:
-                if each.new:
-                    comment = redditbot.comment(id=each.id)
-                    parent = comment.parent()
-                    parse = ((not heroku) and (parent.id not in posts_replied_to)) \
-                            or (heroku and (mc.get(parent.id) is None))
-                    # Parse parent if it's local, and parent comment already not replied to.
-                    # Or parse if it's on heroku, and parent comment is not in memcache
 
-                    if parse:
-                        id = get_comment(new_comment=comment, new_parent=parent)
-                        if id is not None:
-                            if heroku:
-                                mc.set(each, 'T')
-                            else:
-                                posts_replied_to.append(parent.id)
 
-                    each.mark_read()
-                else:
-                    break
-        print (n)
-    if not heroku:
-        with open("posts_replied_to.p", "wb") as f:
-            pickle.dump(posts_replied_to, f)
+    # running this bot locally is no longer a bad idea
 
-    # running this bot locally is not a great idea because
-    # it will never exit the subreddit comment stream
-    # so your list will grow huge and never get saved
-    # granted, it's just a few characters at a time. But just saying.
-    # It's 1:10 AM, and I want to release this bot into the wild.
-    # So.
+    mc.disconnect_all()
+
+    #disconnect from server once done.
 
     print ("Done.")
 
@@ -321,3 +364,4 @@ if __name__ == '__main__':
     imgurbot = imgur_init()
     redditbot= redditbot_init()
     main()
+

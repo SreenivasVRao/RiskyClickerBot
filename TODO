@@ -19,6 +19,4 @@ TESTS:
 
 
 
-# format bot reply better.
 # regex corner cases?
-# use tinyDB for local.
