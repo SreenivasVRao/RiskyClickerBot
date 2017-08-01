@@ -6,3 +6,4 @@
 > Improved bot functioning from a local system. Bot now uses a memcache on local system as well as on Heroku.
   Previously, locally running bot would use a list which would never save to disk.
 > Moved bot version to 1.1.
+> Fixed a bug in the memcache access.

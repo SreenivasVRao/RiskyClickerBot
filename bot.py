@@ -140,8 +140,6 @@ def parse_comment(reddit_comment, root=False):
 
             bot_reply = handle_multiline_comment(bot_reply)
             bot_reply = bot_reply + bottom_text
-            print (bot_reply)
-            exit(0)
 
         else:
             bot_reply = None
@@ -281,7 +279,6 @@ def check_mentions(memcache):
     global redditbot
     mail = redditbot.inbox
     summons = mail.mentions(limit=30)
-
     for each in summons:
         if each.new:
             comment = redditbot.comment(id=each.id)
@@ -293,7 +290,7 @@ def check_mentions(memcache):
             if parse:
                 id = get_comment(new_comment=comment, new_parent=parent)
                 if id is not None:
-                    memcache.set(each, 'T')
+                    memcache.set(id, 'T')
 
             each.mark_read()
         else:
