@@ -345,6 +345,7 @@ def main():
         elif n % 5000 == 0:
             mc = check_mentions(mc)
             # Check inbox for mentions every 5000 comments.
+        print (n)
 
 
     # running this bot locally is no longer a bad idea
