@@ -95,20 +95,27 @@ def parse_comment(reddit_comment, root=False):
             link_type = url_analyzer(each_url)
 
             result, bot_msg = handle_link(each_url, link_type)
-            total = 0
+            sfwtotal = 0
+            nsfwtotal = 0
 
             if result is not None:
                 for k, v in result.items():
-                    total += result[k]['sfw']
-                average = total * 100 / len(result.items())
-                insert_text.append(' **{0:.2f}% SFW** '.format(average))
+                    sfwtotal += result[k]['sfw']
+                    nsfwtotal += result[k]['nsfw']
+
+                sfwaverage = sfwtotal * 100 / len(result.items())
+                nsfwaverage = nsfwtotal * 100 / len(result.items())
+
+                if sfwaverage > nsfwaverage:
+                    insert_text.append(" ** SFW (I'm {0:.2f}% confident) ** ".format(sfwaverage))
+                else:
+                    insert_text.append(" ** NSFW (I'm {0:.2f}% confident) ** ".format(sfwaverage))
 
             elif result is None and link_type is None:
                 failures += 1
                 insert_text.append(' **(Could not process this link.)** ')
 
             url_start_idx = data[current_idx:].find(each_url)
-
 
             next = len(data[0:current_idx]) + url_start_idx + len(each_url)
 

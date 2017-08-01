@@ -7,3 +7,4 @@
   Previously, locally running bot would use a list which would never save to disk.
 > Moved bot version to 1.1.
 > Fixed a bug in the memcache access.
+> Clarified what the percentage meant.
