@@ -39,15 +39,17 @@ def redditbot_init():
 
 def url_analyzer(link):
     # Assuming that the URL is from imgur for now.
-    if link.lower().find('imgur.com/') != -1:
+    if 'imgur.com/' in link.lower():
 
-        if link.lower().find('/a/') != -1:
+        if '/a/' in link.lower():
             return 'album'
 
-        elif link.lower().find('/gallery/') != -1 :
+        elif '/gallery/' in link.lower():
             return 'gallery'
 
-        else: #will be imgur.com/<image id>, or imgur.com/<image id>.extension
+        elif link.split('.')[-1].lower() not in ['gif', 'gifv', 'mp4','webm']:
+            # will be imgur.com/<image id>, or imgur.com/<image id>.extension
+            # prevents gif, gifv, mp4 from being parsed
             return 'imgur_image'
 
     elif link.split('.')[-1].lower() in ['jpeg', 'jpg', 'bmp', 'tiff', 'png']:
@@ -284,6 +286,8 @@ def generate_bot_comment(new_comment, new_parent):
         if botreply is not None:
             new_comment.reply(botreply)
             id = new_parent.id
+        else:
+            print ('No reply for this one.')
     except APIException as a:
         print(a.message, a.error_type)
 
@@ -379,5 +383,7 @@ if __name__ == '__main__':
     heroku = arguments.heroku
     imgurbot = imgur_init()
     redditbot= redditbot_init()
-    main()
+    comment = redditbot.comment(id='dl1elk4')
+    generate_bot_comment(comment, comment.parent())
+    # main()
 
