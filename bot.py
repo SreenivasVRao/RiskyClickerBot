@@ -381,7 +381,5 @@ if __name__ == '__main__':
     heroku = arguments.heroku
     imgurbot = imgur_init()
     redditbot= redditbot_init()
-    comment = redditbot.comment(id='dl1elk4')
-    generate_bot_comment(comment, comment.parent())
-    # main()
+    main()
 
