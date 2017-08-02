@@ -115,11 +115,10 @@ def parse_comment(reddit_comment, root=False):
                 if sfwaverage > nsfwaverage:
                     insert_text.append(" **SFW (I'm {0:.2f}% confident)** ".format(sfwaverage))
                     print ('SFW', sfwaverage)
-                    exit(0)
                 else:
                     insert_text.append(" **NSFW (I'm {0:.2f}% confident)** ".format(nsfwaverage))
                     print ('NSFW', nsfwaverage)
-                    exit(0)
+
             elif result is None and link_type is None:
                 failures += 1
                 insert_text.append(' **(Could not process this link.)** ')
