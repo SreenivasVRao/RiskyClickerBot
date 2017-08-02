@@ -8,3 +8,6 @@
 > Moved bot version to 1.1.
 > Fixed a bug in the memcache access.
 > Clarified what the percentage meant.
+
+# 2 August 2017
+> Fixed a bug which displayed SFW score always instead of NSFW score.
