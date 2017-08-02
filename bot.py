@@ -286,8 +286,6 @@ def generate_bot_comment(new_comment, new_parent):
         if botreply is not None:
             new_comment.reply(botreply)
             id = new_parent.id
-        else:
-            print ('No reply for this one.')
     except APIException as a:
         print(a.message, a.error_type)
 
