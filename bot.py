@@ -344,7 +344,7 @@ def main():
     subreddit = redditbot.subreddit('all')
 
     for n, comment in enumerate(subreddit.stream.comments()):
-        if 'risky click' in comment.body.lower():
+        if 'risky click' in comment.body.lower() or 'r/riskyclick' in comment.body.lower():
             print ('Permalink is', comment.permalink())
             parent = comment.parent()
             parse = (mc.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
