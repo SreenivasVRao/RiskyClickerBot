@@ -285,7 +285,7 @@ def generate_bot_comment(new_comment, new_parent):
         if botreply is not None:
             new_comment.reply(botreply)
             id = new_parent.id
-            print ('I made a new comment.')
+            print ('I made a new comment: ', new_comment.permalink())
     except APIException as a:
         print(a.message, a.error_type)
 
