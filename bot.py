@@ -5,7 +5,7 @@ from imgurpython.helpers import error
 import NSFWDetector
 import os
 import bmemcached
-import pickle
+import time
 from praw.exceptions import APIException
 import argparse
 
@@ -82,7 +82,6 @@ def parse_comment(reddit_comment, root=False):
     # Comments have permalink as a function
 
     subreddit = redditbot.subreddit(sub)
-
 
     if sub not in blacklist['disallowed'] and not subreddit.over18:
         # not checking NSFW subreddits because that's dumb
@@ -335,7 +334,7 @@ def get_memcache_client(herokuFlag=False):
 
 
 def main():
-    global redditbot, location
+    global redditbot
 
     mc = get_memcache_client(heroku)
 

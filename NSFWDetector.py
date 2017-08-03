@@ -10,13 +10,17 @@ def get_predictions(link_list):
     probabilities = {}
 
     for link in link_list:
+        try:
+            reply = model.predict_by_url(url=link)
 
-        reply = model.predict_by_url(url=link)
+            results = reply['outputs'][0]['data']['concepts']
+            temp = {link: {results[0]['name']: results[0]['value'],
+                           results[1]['name']: results[1]['value']}}
+            probabilities.update(temp)
+        except:
+            print ('Clarifai API Error.')
+            continue
 
-        results = reply['outputs'][0]['data']['concepts']
-        temp = {link: {results[0]['name']: results[0]['value'],
-                       results[1]['name']: results[1]['value']}}
-        probabilities.update(temp)
 
     return probabilities
 
