@@ -100,8 +100,8 @@ def parse_comment(reddit_comment, root=False):
         failures = 0
         for each_url in urls[0:6]:
             link_type = url_analyzer(each_url)
-
             result, bot_msg = handle_link(each_url, link_type)
+
             sfwtotal = 0
             nsfwtotal = 0
 
@@ -109,18 +109,18 @@ def parse_comment(reddit_comment, root=False):
                 for k, v in result.items():
                     sfwtotal += result[k]['sfw']
                     nsfwtotal += result[k]['nsfw']
+                if len(result.items()) > 0:
+                    sfwaverage = sfwtotal * 100 / len(result.items())
+                    nsfwaverage = nsfwtotal * 100 / len(result.items())
 
-                sfwaverage = sfwtotal * 100 / len(result.items())
-                nsfwaverage = nsfwtotal * 100 / len(result.items())
+                    if sfwaverage > nsfwaverage:
+                        insert_text.append(" **SFW (I'm {0:.2f}% confident)** ".format(sfwaverage))
+                        print ('SFW', sfwaverage)
+                    else:
+                        insert_text.append(" **NSFW (I'm {0:.2f}% confident)** ".format(nsfwaverage))
+                        print ('NSFW', nsfwaverage)
 
-                if sfwaverage > nsfwaverage:
-                    insert_text.append(" **SFW (I'm {0:.2f}% confident)** ".format(sfwaverage))
-                    print ('SFW', sfwaverage)
-                else:
-                    insert_text.append(" **NSFW (I'm {0:.2f}% confident)** ".format(nsfwaverage))
-                    print ('NSFW', nsfwaverage)
-
-            elif result is None and link_type is None:
+            elif result is None:
                 failures += 1
                 insert_text.append(' **(Could not process this link.)** ')
 
@@ -249,7 +249,11 @@ def handle_link(link, linktype):
 
     elif linktype == 'imgur_image':
         link = ensure_extension(link)
-        status = NSFWDetector.get_predictions([link])
+        if link.split('.')[-1].lower() not in ['gif', 'gifv', 'mp4', 'webm']:
+            status = NSFWDetector.get_predictions([link])
+        else:
+            status = None
+            message = " (Couldn't process this link.) "
 
     elif linktype == 'image_direct':
         status = NSFWDetector.get_predictions([link])

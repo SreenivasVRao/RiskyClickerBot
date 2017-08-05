@@ -1,5 +1,6 @@
 from __future__ import print_function
 from clarifai.rest import ClarifaiApp
+from clarifai.rest import client
 import os
 
 global app, model
@@ -17,9 +18,10 @@ def get_predictions(link_list):
             temp = {link: {results[0]['name']: results[0]['value'],
                            results[1]['name']: results[1]['value']}}
             probabilities.update(temp)
-        except:
-            print ('Clarifai API Error.')
+        except client.ApiError as e:
+            print ('Clarifai', e.error_desc)
             continue
+
 
 
     return probabilities
