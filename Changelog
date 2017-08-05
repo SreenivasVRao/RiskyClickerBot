@@ -11,3 +11,7 @@
 
 # 2 August 2017
 > Fixed a bug which displayed SFW score always instead of NSFW score.
+
+# 5 August 2017
+> Gifs were being sent to Clarifai API. Added check for gif/gifv/webm/mp4.
+> Division by zero was occurring when finding average score. Added check for number of scores.
