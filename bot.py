@@ -150,6 +150,8 @@ def parse_comment(reddit_comment, root=False):
                           '\n\n^^*RiskyClickerBot* ^^*v1.1*' + \
                           '\n\n ^^Am ^^I ^^broken? [^^Contact ^^the ^^Developer](/u/PigsDogsAndSheep)' + \
                           ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
+                          ' ^^| [^^How ^^it ^^works](https://medium.com/@sreenivasvrao/introducing-u-riskyclickerbot-22b3d56d1e2a)' + \
+                          ' ^^| [^^More ^^Technical ^^Explanation](https://medium.com/@sreenivasvrao/making-reddit-safer-for-work-with-u-riskyclickerbot-3bcb54fc1fe6)' + \
                           '\n\n ^^You ^^can ^^summon ^^me ^^too. [^^Example](http://imgur.com/TsvwFht) ' + \
                           '\n\n ^^I ^^reply ^^once ^^per ^^parent ^^comment. ^^I ^^also ^^won\'t ^^process ^^more ^^than ^^6 ^^URLS ' + \
                           '^^per ^^parent ^^due ^^to ^^API ^^restrictions.'
