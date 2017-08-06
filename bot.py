@@ -114,10 +114,10 @@ def parse_comment(reddit_comment, root=False):
                     nsfwaverage = nsfwtotal * 100 / len(result.items())
 
                     if sfwaverage > nsfwaverage:
-                        insert_text.append(" **SFW (I'm {0:.2f}% confident)** ".format(sfwaverage))
+                        insert_text.append(' **[Hover to reveal](/spoiler "SFW (I\'m {0:.2f}% confident)")** '.format(sfwaverage))
                         print ('SFW', sfwaverage)
                     else:
-                        insert_text.append(" **NSFW (I'm {0:.2f}% confident)** ".format(nsfwaverage))
+                        insert_text.append(' **[Hover to reveal](/spoiler "NSFW (I\'m {0:.2f}% confident)")** '.format(nsfwaverage))
                         print ('NSFW', nsfwaverage)
 
             elif result is None:
@@ -147,7 +147,7 @@ def parse_comment(reddit_comment, root=False):
             #Add the remaining text.
 
             bottom_text = '\n \n ___' + \
-                          '\n\n^^*RiskyClickerBot* ^^*v1.1*' + \
+                          '\n\n^^*RiskyClickerBot* ^^*v1.1.5*' + \
                           '\n\n ^^Am ^^I ^^broken? [^^Contact ^^the ^^Developer](/u/PigsDogsAndSheep)' + \
                           ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
                           ' ^^| [^^How ^^it ^^works](https://medium.com/@sreenivasvrao/introducing-u-riskyclickerbot-22b3d56d1e2a)' + \

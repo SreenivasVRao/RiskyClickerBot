@@ -22,8 +22,6 @@ def get_predictions(link_list):
             print ('Clarifai', e.error_desc)
             continue
 
-
-
     return probabilities
 
 
@@ -38,7 +36,7 @@ if __name__ == 'NSFWDetector':
     app, model = launch_app()
 
 elif __name__ == '__main__':
-    app= launch_app()
+    app, model= launch_app()
 
-    answer = get_predictions(['http://imgur.com/JlVKy4W.jpg'])
-    print (answer)
+    answer = model.predict_by_url('http://imgur.com/JlVKy4W.jpg')
+    print (type(answer))
