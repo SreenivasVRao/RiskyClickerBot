@@ -18,6 +18,7 @@ For Imgur  - Follow [this video](https://www.youtube.com/watch?v=OiDQu-0-DIA) - 
 
 For Clarifai - [This article](http://blog.clarifai.com/introducing-api-keys-a-safer-way-to-authenticate-your-applications/) will help. I have set the scope to 'all' for my API key, although it can probably work with just the prediction scope.
 
+
 Once you have the keys ready in `vars.sh`:
 
 	. vars.sh
@@ -27,6 +28,8 @@ will load the variables in your current shell
 Following that, you need to launch the bot:
 
 	python bot.py
+
+Running the bot on Heroku is possible by using the `--heroku` switch. However, Reddit usually frowns on duplicate bots. On the other hand, I'll gladly take pull requests for this bot. :)
 
 # License
 TBD
