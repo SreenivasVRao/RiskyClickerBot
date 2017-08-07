@@ -31,6 +31,9 @@ Following that, you need to launch the bot:
 
 Running the bot on Heroku is possible by using the `--heroku` switch. However, Reddit usually frowns on duplicate bots. On the other hand, I'll gladly take pull requests for this bot. :)
 
-# License
-TBD
+# Acknowledgements
+[praw](https://github.com/praw-dev/praw/) (c) 2016, Bryce Boe -  licensed under BSD 2-clause "Simplified" License
+[imgurpython](https://github.com/Imgur/imgurpython)  (c) 2014 Imgur LLC - licensed under MIT license.
+[clarifai](https://github.com/Clarifai/clarifai-python) (c) 2016 Clarifai, Inc. - licensed under Apache License, Version 2.0
+[bmemcached](https://github.com/jaysonsantos/python-binary-memcached/) (c) 2011 Jayson Reis - licensed under MIT license.
 
