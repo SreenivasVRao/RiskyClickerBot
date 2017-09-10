@@ -1,0 +1,6 @@
+libavformat-dev 
+libavcodec-dev 
+libavdevice-dev
+libavutil-dev 
+libswscale-dev 
+libavresample-dev
