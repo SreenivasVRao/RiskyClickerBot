@@ -8,3 +8,6 @@ libgl1-mesa-glx
 libgl1-mesa-swx11
 libxdamage-dev
 libxdamage1
+libxfixes-dev
+libxfixes3
+libxfixes3-udeb
