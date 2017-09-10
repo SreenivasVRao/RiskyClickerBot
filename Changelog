@@ -15,3 +15,9 @@
 # 5 August 2017
 > Gifs were being sent to Clarifai API. Added check for gif/gifv/webm/mp4.
 > Division by zero was occurring when finding average score. Added check for number of scores.
+
+# 10 August 2017
+> Re-organized code - created a few different classes.
+> Added support for Imgur GIF/GIFV/MP4/WEBM.
+> Modified the methods for handling multiple NSFW/SFW scores. Bot now reports average NSFW score for videos. Max NSFW score for albums.
+> Moved bot version to 1.2
