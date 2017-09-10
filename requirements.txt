@@ -1,4 +1,5 @@
-imgurpython==1.1.7
-python_binary_memcached==0.26.1
 praw==5.0.1
-clarifai==2.0.30
+python_binary_memcached==0.26.1
+imgurpython==1.1.7
+av==0.3.3
+clarifai==2.0.32
