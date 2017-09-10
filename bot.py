@@ -318,4 +318,6 @@ if __name__ == '__main__':
     RiskyClickerBot = RiskyClickerBot()
     comment = RiskyClickerBot.bot.comment(id='dmswooh')
     parent = comment.parent()
+
+    #RiskyClickerBot.generate_comment(comment, parent)
     RiskyClickerBot.browseReddit()
