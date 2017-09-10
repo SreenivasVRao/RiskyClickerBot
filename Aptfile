@@ -5,4 +5,4 @@ libavutil-dev
 libswscale-dev 
 libavresample-dev
 libgl1-mesa-swx11
-
+libgl1-mesa-glx
