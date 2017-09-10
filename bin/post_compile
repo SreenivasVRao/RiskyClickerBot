@@ -1,5 +1,6 @@
 echo "Executing post_compile script"
-echo "$BUILD_DIR/.profile.d/"
+echo $LD_LIBRARY_PATH
+ls $LD_LIBRARY_PATH
 source $BUILD_DIR/.profile.d/ffmpeg.sh
 pip uninstall av
 pip install -Iv av==0.3.3
