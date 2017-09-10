@@ -7,3 +7,4 @@ libavresample-dev
 libgl1-mesa-glx
 libgl1-mesa-swx11
 libxdamage-dev
+libxdamage1
