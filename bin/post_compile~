@@ -2,5 +2,4 @@ echo "Executing post_compile script"
 echo $LD_LIBRARY_PATH
 source $BUILD_DIR/.profile.d/ffmpeg.sh
 pip install av
-PATH= $PATH:/app/vendor/ffmpeg/ffmpeg-3.3.3-64bit-static
-export PATH
+
