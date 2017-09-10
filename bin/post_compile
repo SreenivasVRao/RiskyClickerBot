@@ -1,8 +1,4 @@
 echo "Executing post_compile script"
 echo $LD_LIBRARY_PATH
-ls $LD_LIBRARY_PATH
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/.apt/usr/lib/x86_64-linux-gnu/mesa
-export LD_LIBRARY_PATH
 source $BUILD_DIR/.profile.d/ffmpeg.sh
-pip uninstall av
-pip install -Iv av==0.3.3
+pip install av
