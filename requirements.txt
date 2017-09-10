@@ -2,4 +2,4 @@ praw==5.0.1
 python_binary_memcached==0.26.1
 imgurpython==1.1.7
 clarifai==2.0.32
-cStringIO
+cStringIO==1.9
