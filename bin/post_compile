@@ -1,2 +1,2 @@
-source ~/.profile.d/ffmpeg.sh
+source $BUILD_DIR/.profile.d/ffmpeg.sh
 pip install av
