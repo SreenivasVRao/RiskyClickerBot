@@ -1,4 +1,4 @@
 echo "Executing post_compile script"
 echo "$BUILD_DIR/.profile.d/"
 source $BUILD_DIR/.profile.d/ffmpeg.sh
-pip install av
+pip install av=0.3.3
