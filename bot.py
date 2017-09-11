@@ -210,7 +210,7 @@ class RiskyClickerBot:
 
         elif linktype is None:
             status = None
-            message = "(Couldn't process this link.)"
+            message = None
 
         return status, message
 
