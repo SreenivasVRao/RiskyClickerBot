@@ -1,3 +1,4 @@
+pkg-config
 libavformat-dev 
 libavcodec-dev 
 libavdevice-dev
