@@ -198,8 +198,11 @@ class RiskyClickerBot:
             sfw_score = status[status.keys()[0]]['sfw']
             if sfw_score > nsfw_score:
                 message = 'SFW. I\'m {0:.2f}% confident'.format(sfw_score)
+                message = '**[Hover to reveal](#s "' + message + '")**'  # reddit spoiler tag added.
+
             else:
                 message = 'NSFW. I\'m {0:.2f}% confident'.format(nsfw_score)
+                message = '**[Hover to reveal](#s "' + message + '")**'  # reddit spoiler tag added.
 
         elif linktype == 'gif':
             pass
@@ -319,5 +322,4 @@ if __name__ == '__main__':
     comment = RiskyClickerBot.bot.comment(id='dmswooh')
     parent = comment.parent()
 
-    #RiskyClickerBot.generate_comment(comment, parent)
     RiskyClickerBot.browseReddit()
