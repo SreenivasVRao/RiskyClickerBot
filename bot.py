@@ -106,26 +106,31 @@ class RiskyClickerBot:
             failures = 0
             for each_url in urls[0:6]:
                 link_type = self.url_analyzer(each_url)
-                result, bot_msg = self.handle_link(each_url, link_type)
 
-                if bot_msg is not None:
-                    insert_text.append(' '+bot_msg)
-
-                elif result is None:
+                if link_type is None:
                     failures += 1
                     insert_text.append(' **(Could not process this link.)** ')
 
-                url_start_idx = data[current_idx:].find(each_url)
+                else:
+                    result, bot_msg = self.handle_link(each_url, link_type)
 
-                next = len(data[0:current_idx]) + url_start_idx + len(each_url)
 
-                # next += self.get_markup_offset(data[url_start_idx:])
-                if next < len(data) and data[next] == ')':
-                    #accounting for reddit markup
-                    next += 1
+                    if bot_msg is not None:
+                        insert_text.append(' '+bot_msg)
+
+
+                    url_start_idx = data[current_idx:].find(each_url)
+
+                    next = len(data[0:current_idx]) + url_start_idx + len(each_url)
+
+                    # next += self.get_markup_offset(data[url_start_idx:])
+                    if next < len(data) and data[next] == ')':
+                        #accounting for reddit markup
+                        next += 1
 
                 indices.append(next)
                 current_idx = next
+
             current_idx = 0
             bot_reply = ''
             if len(urls) > failures:
