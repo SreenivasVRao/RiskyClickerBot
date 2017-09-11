@@ -1,8 +1,7 @@
 echo "Executing post_compile script"
 echo $LD_LIBRARY_PATH
 source $BUILD_DIR/.profile.d/ffmpeg.sh
-echo $(find -name 'ffmpeg-*')
-PATH= $PATH:$BUILD_DIR/vendor/ffmpeg/ffmpeg-3.3.3-64bit-static
+PATH= $PATH:./vendor/ffmpeg/ffmpeg-3.3.3-64bit-static/
 export PATH
 echo "Path variable after compilation"
 echo $PATH
