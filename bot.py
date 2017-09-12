@@ -51,8 +51,12 @@ class RiskyClickerBot:
         elif link.split('.')[-1].lower() in ['jpeg', 'jpg', 'bmp', 'tiff', 'png']:
             return 'image_direct'
 
-        elif link.split('.')[-1].lower() in ['gif', 'gifv', 'mp4', 'webm']:
+        elif link.split('.')[-1].lower() in ['gif', 'gifv', 'webm']:
             return 'gif'
+
+        elif link.split('.')[-1].lower() in ['mp4']:
+            return 'mp4'
+
 
         # Future work
         # elif 'gfycat.com/' in link.lower():
@@ -106,18 +110,17 @@ class RiskyClickerBot:
             failures = 0
             for each_url in urls[0:6]:
                 link_type = self.url_analyzer(each_url)
-
                 if link_type is None:
                     failures += 1
                     insert_text.append(' **(Could not process this link.)** ')
 
                 else:
                     result, bot_msg = self.handle_link(each_url, link_type)
-
-
                     if bot_msg is not None:
                         insert_text.append(' '+bot_msg)
-
+                    elif bot_msg is None:
+                        failures += 1
+                        insert_text.append(' **(Could not process this link.)** ')
 
                     url_start_idx = data[current_idx:].find(each_url)
 
@@ -156,7 +159,6 @@ class RiskyClickerBot:
 
             else:
                 bot_reply = None
-
         return bot_reply
 
     def handle_multiline_comment(self, text):
@@ -177,7 +179,6 @@ class RiskyClickerBot:
         return result
 
     def handle_link(self, link, linktype):
-
         status = None
         message = None
 
@@ -210,8 +211,31 @@ class RiskyClickerBot:
                 message = '**[Hover to reveal](#s "' + message + '")**'  # reddit spoiler tag added.
 
         elif linktype == 'gif':
+            status = None
+            message = None
             pass
             #future work
+
+        elif linktype == 'gif':
+            status = None
+            message = None
+            #future work
+
+        elif linktype == 'mp4':
+            filename = 'video.mp4'
+            urllib.urlretrieve(link, filename)
+            status= {link: VideoAnalyzer.make_prediction(filename)}
+            os.remove(filename)
+
+            nsfw_score = [v['nsfw'] for k, v in status.items()][0]
+            sfw_score = [v['sfw'] for k, v in status.items()][0]
+
+            if nsfw_score > sfw_score:
+                message = 'NSFW.  I\'m {0:.2f}% confident.'.format(nsfw_score)
+                message = '**[Hover to reveal](#s "' + message + ' ")**'  # reddit spoiler tag added.
+            else:
+                message = 'SFW. I\'m {0:.2f}% confident.'.format(sfw_score)
+                message = '**[Hover to reveal](#s "' + message + ' ")**'  # reddit spoiler tag added.
 
         elif linktype is None:
             status = None
@@ -324,7 +348,8 @@ if __name__ == '__main__':
     heroku = arguments.heroku
     imgurbot = imgur.Bot()
     RiskyClickerBot = RiskyClickerBot()
-    comment = RiskyClickerBot.bot.comment(id='dmswooh')
-    parent = comment.parent()
+    # comment = RiskyClickerBot.bot.comment(id='dmvh45i')
+    # parent = comment.parent()
+    # RiskyClickerBot.generate_comment(comment, parent)
 
     RiskyClickerBot.browseReddit()
