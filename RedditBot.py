@@ -251,10 +251,9 @@ class RiskyClickerBot:
 
         try:
             if botreply is not None:
-                #new_comment.reply(botreply)
-                print(botreply)
+                new_comment.reply(botreply)
                 id = new_parent.id
-                #print ('I made a new comment: reddit.com'+ new_comment.permalink)
+                print ('I made a new comment: reddit.com'+ new_comment.permalink)
         except APIException as a:
             print(a.message, a.error_type)
 
