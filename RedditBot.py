@@ -1,20 +1,19 @@
 from __future__ import print_function
-import praw, json, re
-import imgur
-import clarifai_system
-import os
-import bmemcached
-import VideoAnalyzer
-import urllib
-from praw.exceptions import APIException
-import argparse
+import json, re, os, operator, urllib, argparse
 
-global heroku
+import praw
+from praw.exceptions import APIException
+
+import ImgurBot
+import VideoBot
+import bmemcached
+import SlaveBot
+import GfycatBot
 
 
 class RiskyClickerBot:
 
-    def __init__(self):
+    def __init__(self, heroku, slave_bot, imgurbot, videobot, gfycatbot):
 
         PRAW_CLIENT_ID = os.environ.get('PRAW_CLIENT_ID')
         PRAW_CLIENT_SECRET = os.environ.get('PRAW_CLIENT_SECRET')
@@ -27,6 +26,11 @@ class RiskyClickerBot:
                           user_agent=PRAW_USERAGENT, username=PRAW_USERNAME)
         self.markupregex = re.compile("( )*http.+\)", re.S)
         self.newlineregex = re.compile("\n\n")
+        self.heroku_flag = heroku
+        self.slave_bot = slave
+        self.imgurbot = imgurbot
+        self.video_bot = videobot
+        self.gfycat_bot = gfycatbot
 
     def url_analyzer(self, link):
         # Assuming that the URL is from imgur for now.
@@ -57,16 +61,12 @@ class RiskyClickerBot:
         elif link.split('.')[-1].lower() in ['mp4']:
             return 'mp4'
 
+        elif 'gfycat.com/' in link.lower():
+            return 'gfycat_video'
 
-        # Future work
-        # elif 'gfycat.com/' in link.lower():
-        #     return 'gfycat_video'
-        #
         # elif 'media.giphy.com/' in link.lower():
         #     return 'giphy_gif'
         #
-        # elif 'streamable.com/' in link.lower():
-        #     return 'streamable_video'
 
         else:
             return None
@@ -84,17 +84,13 @@ class RiskyClickerBot:
         bot_reply = None
         with open('blacklist.json', 'rb') as f:
             blacklist = json.load(f)
-        if root:
             sub = reddit_comment.permalink.split('/')[2].lower()
-        else:
-            sub = reddit_comment.permalink().split('/')[2].lower()
-        # Bleddy PRAW has a weird kink. Submission objects have permalink as an attribute
-        # Comments have permalink as a function
 
         subreddit = self.bot.subreddit(sub)
 
         if sub not in blacklist['disallowed'] and not subreddit.over18:
             # not checking NSFW subreddits because that's dumb
+
             if not root:
                 data = reddit_comment.body
             elif root:
@@ -145,7 +141,7 @@ class RiskyClickerBot:
                 #Add the remaining text.
 
                 bottom_text = '\n \n ___' + \
-                              '\n\n^^*RiskyClickerBot* ^^*v1.2* ^^| ^^*Now* ^^*with* ^^*experimental* ^^*imgur* ^^*gif* ^^*support!*' + \
+                              '\n\n^^*RiskyClickerBot* ^^*v2* ^^| ^^*Now* ^^*with* ^^*experimental* ^^*gfycat* ^^*support!*' + \
                               '\n\n ^^Am ^^I ^^broken? [^^Contact ^^the ^^Developer](/u/PigsDogsAndSheep)' + \
                               ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
                               ' ^^| [^^How ^^it ^^works](https://medium.com/@sreenivasvrao/introducing-u-riskyclickerbot-22b3d56d1e2a)' + \
@@ -182,39 +178,31 @@ class RiskyClickerBot:
         status = None
         message = None
 
-        imgurbot = imgur.Bot()
-
         if linktype == 'imgur_album':
-            status, message = imgurbot.handle_album(link)
+            status, message = self.imgurbot.handle_album(link)
 
         elif linktype == 'imgur_gallery':
-            status, message = imgurbot.handle_gallery(link)
+            status, message = self.imgurbot.handle_gallery(link)
 
         elif linktype == 'imgur_image':
-            status, message = imgurbot.handle_images([link])
+            status, message = self.imgurbot.handle_images([link])
 
         elif linktype == 'imgur_video':
-            status, message = imgurbot.handle_videos([link])
+            status, message = self.imgurbot.handle_videos([link])
 
         elif linktype == 'image_direct':
-            status = clarifai_system.NSFWDetector().get_predictions([link])
-            # status will be {<link>: {'sfw':<score>, 'nsfw':<score>}
+            status = self.slave_bot.analyze([link])
 
-            nsfw_score = status[status.keys()[0]]['nsfw']
-            sfw_score = status[status.keys()[0]]['sfw']
-            if sfw_score > nsfw_score:
-                message = 'SFW. I\'m {0:.2f}% confident'.format(sfw_score)
-                message = '**[Hover to reveal](#s "' + message + '")**'  # reddit spoiler tag added.
+            if status[link] is not None:
+                labels = sorted(status[link].items(), key=operator.itemgetter(1), reverse=True)
 
+                tag, confidence = labels[0]
+
+                message = tag + ". I'm  {0:.2f}% confident.".format(confidence)
+                message = '**[Hover to reveal](#s "' + message + ' ")**'  # reddit spoiler tag added.
             else:
-                message = 'NSFW. I\'m {0:.2f}% confident'.format(nsfw_score)
-                message = '**[Hover to reveal](#s "' + message + '")**'  # reddit spoiler tag added.
-
-        elif linktype == 'gif':
-            status = None
-            message = None
-            pass
-            #future work
+                status = None
+                message = None
 
         elif linktype == 'gif':
             status = None
@@ -223,19 +211,27 @@ class RiskyClickerBot:
 
         elif linktype == 'mp4':
             filename = 'video.mp4'
+
             urllib.urlretrieve(link, filename)
-            status= {link: VideoAnalyzer.make_prediction(filename)}
-            os.remove(filename)
+            status = {link: self.video_bot.make_prediction(filename)}
 
-            nsfw_score = [v['nsfw'] for k, v in status.items()][0]
-            sfw_score = [v['sfw'] for k, v in status.items()][0]
+            if status[link] is not None:
+                labels = sorted(status[link].items(), key=operator.itemgetter(1), reverse=True)
 
-            if nsfw_score > sfw_score:
-                message = 'NSFW.  I\'m {0:.2f}% confident.'.format(nsfw_score)
+                tag, confidence = labels[0]
+
+                message = tag + ". I'm  {0:.2f}% confident.".format(confidence)
                 message = '**[Hover to reveal](#s "' + message + ' ")**'  # reddit spoiler tag added.
             else:
-                message = 'SFW. I\'m {0:.2f}% confident.'.format(sfw_score)
-                message = '**[Hover to reveal](#s "' + message + ' ")**'  # reddit spoiler tag added.
+                status = None
+                message = None
+
+            if os.path.exists(filename):
+                os.remove(filename)
+
+        elif linktype == 'gfycat_video':
+            status, message = self.gfycat_bot.analyze_gfy(link)
+
 
         elif linktype is None:
             status = None
@@ -257,7 +253,7 @@ class RiskyClickerBot:
             if botreply is not None:
                 new_comment.reply(botreply)
                 id = new_parent.id
-                print ('I made a new comment: reddit.com'+ new_comment.permalink())
+                print ('I made a new comment: reddit.com'+ new_comment.permalink)
         except APIException as a:
             print(a.message, a.error_type)
 
@@ -285,7 +281,7 @@ class RiskyClickerBot:
 
         return memcache
 
-    def get_memcache_client(self, herokuFlag=False):
+    def get_memcache_client(self):
         # Store IDs of comments that the bot has already replied to.
         # Read local cache by default
 
@@ -293,7 +289,7 @@ class RiskyClickerBot:
         MEMCACHEDCLOUD_USERNAME = 'user'
         MEMCACHEDCLOUD_PASSWORD = 'password'
 
-        if heroku:
+        if self.heroku_flag:
             MEMCACHEDCLOUD_SERVERS = os.environ.get('MEMCACHEDCLOUD_SERVERS')
             MEMCACHEDCLOUD_USERNAME = os.environ.get('MEMCACHEDCLOUD_USERNAME')
             MEMCACHEDCLOUD_PASSWORD = os.environ.get('MEMCACHEDCLOUD_PASSWORD')
@@ -304,18 +300,17 @@ class RiskyClickerBot:
 
     def browseReddit(self):
 
-        mc = self.get_memcache_client(heroku)
-
-        # heroku is a flag - set to True if running from that platform
+        memcache_client = self.get_memcache_client()
 
         # subreddit = redditbot.subreddit('all')
         subreddit = self.bot.subreddit('all')
 
         for n, comment in enumerate(subreddit.stream.comments()):
-            if 'risky click' in comment.body.lower() or 'r/riskyclick' in comment.body.lower():
+            if 'risky click' in comment.body.lower() or 'r/riskyclick' in comment.body.lower() \
+                    or 'riskyclick' in comment.body.lower():
                 print ('Permalink is', comment.permalink())
                 parent = comment.parent()
-                parse = (mc.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
+                parse = (memcache_client.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
 
                 # If the parent is not already replied to
                 # and if the parent comment is not by this bot
@@ -323,18 +318,19 @@ class RiskyClickerBot:
                 if parse:
                     id = self.generate_comment(new_comment=comment, new_parent=parent)
                     if id is not None:
-                        mc.set(parent.id, 'T')
+                        memcache_client.set(parent.id, 'T')
                 else:
-                    print (parent.author, mc.get(parent.id))
+                    print (parent.author, memcache_client.get(parent.id))
 
             elif n % 5000 == 0:
-                mc = self.check_mentions(mc)
+                print (n)
+
+                memcache_client = self.check_mentions(memcache_client)
                 # Check inbox for mentions every 5000 comments.
-            print (n)
 
         # running this bot locally is no longer a bad idea
 
-        mc.disconnect_all()
+        memcache_client.disconnect_all()
 
         # disconnect from server once done.
 
@@ -346,10 +342,12 @@ if __name__ == '__main__':
     parser.add_argument('--heroku', action='store_true')
     arguments = parser.parse_args()
     heroku = arguments.heroku
-    imgurbot = imgur.Bot()
-    RiskyClickerBot = RiskyClickerBot()
-    # comment = RiskyClickerBot.bot.comment(id='dmvh45i')
-    # parent = comment.parent()
-    # RiskyClickerBot.generate_comment(comment, parent)
+
+    slave = SlaveBot.Slave()
+    VideoBot= VideoBot.Bot(slave)
+    imgurbot = ImgurBot.Bot(VideoBot, slave)
+
+    GfyBot = GfycatBot.Bot(VideoBot)
+    RiskyClickerBot = RiskyClickerBot(heroku, slave, imgurbot, VideoBot, GfyBot)
 
     RiskyClickerBot.browseReddit()

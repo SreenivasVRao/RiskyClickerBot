@@ -1,1 +1,1 @@
-bot: python bot.py --heroku
+bot: python RedditBot.py --heroku
