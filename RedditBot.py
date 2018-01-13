@@ -142,7 +142,7 @@ class RiskyClickerBot:
 
                 bottom_text = '\n \n ___' + \
                               '\n\n^^*RiskyClickerBot* ^^*v2* ^^| ^^*Now* ^^*with* ^^*experimental* ^^*gfycat* ^^*support!*' + \
-                              '\n\n ^^Am ^^I ^^broken? [^^Contact ^^the ^^Developer](/u/PigsDogsAndSheep)' + \
+                              '\n\n ^^Am ^^I ^^broken? ^^Contact ^^/u/PigsDogsAndSheep' + \
                               ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
                               ' ^^| [^^How ^^it ^^works](https://medium.com/@sreenivasvrao/introducing-u-riskyclickerbot-22b3d56d1e2a)' + \
                               ' ^^| [^^More ^^Technical ^^Explanation](https://medium.com/@sreenivasvrao/making-reddit-safer-for-work-with-u-riskyclickerbot-3bcb54fc1fe6)' + \
@@ -251,9 +251,10 @@ class RiskyClickerBot:
 
         try:
             if botreply is not None:
-                new_comment.reply(botreply)
+                #new_comment.reply(botreply)
+                print(botreply)
                 id = new_parent.id
-                print ('I made a new comment: reddit.com'+ new_comment.permalink)
+                #print ('I made a new comment: reddit.com'+ new_comment.permalink)
         except APIException as a:
             print(a.message, a.error_type)
 
