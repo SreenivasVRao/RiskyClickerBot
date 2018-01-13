@@ -308,7 +308,7 @@ class RiskyClickerBot:
         for n, comment in enumerate(subreddit.stream.comments()):
             if 'risky click' in comment.body.lower() or 'r/riskyclick' in comment.body.lower() \
                     or 'riskyclick' in comment.body.lower():
-                print ('Permalink is', comment.permalink())
+                print ('Permalink is', comment.permalink)
                 parent = comment.parent()
                 parse = (memcache_client.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
 
