@@ -3,7 +3,7 @@ import json, re, os, operator, urllib, argparse
 
 import praw
 from praw.exceptions import APIException
-
+import prawcore
 import ImgurBot
 import VideoBot
 import bmemcached
@@ -252,10 +252,13 @@ class RiskyClickerBot:
         try:
             if botreply is not None:
                 new_comment.reply(botreply)
+                #print (botreply)
                 id = new_parent.id
                 print ('I made a new comment: reddit.com'+ new_comment.permalink)
         except APIException as a:
             print(a.message, a.error_type)
+        except prawcore.exceptions.Forbidden as e:
+            print (e.message) # If bot is banned from the sub.
 
         return id
 
@@ -265,6 +268,7 @@ class RiskyClickerBot:
         summons = mail.mentions(limit=30)
         for each in summons:
             if each.new:
+                each.mark_read()
                 comment = self.bot.comment(id=each.id)
                 parent = comment.parent()
                 parse = (memcache.get(parent.id) is None) and (parent.author != 'RiskyClickerBot')
@@ -275,7 +279,6 @@ class RiskyClickerBot:
                     if id is not None:
                         memcache.set(id, 'T')
 
-                each.mark_read()
             else:
                 break
 
@@ -349,5 +352,7 @@ if __name__ == '__main__':
 
     GfyBot = GfycatBot.Bot(VideoBot)
     RiskyClickerBot = RiskyClickerBot(heroku, slave, imgurbot, VideoBot, GfyBot)
-
+    # comment = RiskyClickerBot.bot.comment(id='dspjd1n')
+    # parent = comment.parent()
+    # RiskyClickerBot.generate_comment(comment, parent)
     RiskyClickerBot.browseReddit()
