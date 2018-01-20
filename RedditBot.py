@@ -142,7 +142,7 @@ class RiskyClickerBot:
                 #Add the remaining text.
 
                 bottom_text = '\n \n ___' + \
-                              '\n\n^^*RiskyClickerBot* ^^*v2* ^^' + \
+                              '\n\n^^*RiskyClickerBot* ^^*v2*' + \
                               '\n\n ^^Am ^^I ^^broken? ^^Contact ^^/u/PigsDogsAndSheep' + \
                               ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
                               ' ^^| [^^How ^^it ^^works](https://medium.com/@sreenivasvrao/introducing-u-riskyclickerbot-22b3d56d1e2a)' + \
