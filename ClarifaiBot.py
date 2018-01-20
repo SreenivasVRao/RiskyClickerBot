@@ -62,4 +62,4 @@ if __name__ == '__main__':
     bot = Bot()
     link = 'https://i.pinimg.com/736x/69/6e/ca/696ecaa640bad3a0a8b5fbb4398f3b51--medical-pictures-medical-problems.jpg'
     #print (bot.get_predictions(['http://imgur.com/JlVKy4W.jpg']))
-    print (bot.get_all_predictions([link]))
+    print (bot.get_prediction(link, 'url'))

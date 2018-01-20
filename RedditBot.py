@@ -95,6 +95,7 @@ class RiskyClickerBot:
                 data = reddit_comment.body
             elif root:
                 data = reddit_comment.url
+            print (data)
             regexp = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+[#0-9A-Za-z]+'
             urls = re.findall(regexp, data)
             # Mainly based on https://stackoverflow.com/a/6883094
@@ -141,20 +142,18 @@ class RiskyClickerBot:
                 #Add the remaining text.
 
                 bottom_text = '\n \n ___' + \
-                              '\n\n^^*RiskyClickerBot* ^^*v2* ^^| ^^*Now* ^^*with* ^^*experimental* ^^*gfycat* ^^*support!*' + \
+                              '\n\n^^*RiskyClickerBot* ^^*v2* ^^' + \
                               '\n\n ^^Am ^^I ^^broken? ^^Contact ^^/u/PigsDogsAndSheep' + \
                               ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
                               ' ^^| [^^How ^^it ^^works](https://medium.com/@sreenivasvrao/introducing-u-riskyclickerbot-22b3d56d1e2a)' + \
-                              ' ^^| [^^More ^^Technical ^^Explanation](https://medium.com/@sreenivasvrao/making-reddit-safer-for-work-with-u-riskyclickerbot-3bcb54fc1fe6)' + \
-                              '\n\n ^^You ^^can ^^summon ^^me ^^too! [^^Example](http://imgur.com/TsvwFht) ' + \
-                              '\n\n ^^I ^^reply ^^once ^^per ^^parent ^^comment. ^^I ^^also ^^won\'t ^^process ^^more ^^than ^^6 ^^URLS ' + \
-                              '^^per ^^parent ^^due ^^to ^^API ^^restrictions.'
+                              '\n\n ^^You ^^can ^^summon ^^me ^^too! [^^Example](http://imgur.com/TsvwFht) '
 
                 bot_reply = self.handle_multiline_comment(bot_reply)
                 bot_reply += bottom_text
 
             else:
                 bot_reply = None
+
         return bot_reply
 
     def handle_multiline_comment(self, text):
@@ -177,7 +176,6 @@ class RiskyClickerBot:
     def handle_link(self, link, linktype):
         status = None
         message = None
-
         if linktype == 'imgur_album':
             status, message = self.imgurbot.handle_album(link)
 
@@ -252,7 +250,6 @@ class RiskyClickerBot:
         try:
             if botreply is not None:
                 new_comment.reply(botreply)
-                #print (botreply)
                 id = new_parent.id
                 print ('I made a new comment: reddit.com'+ new_comment.permalink)
         except APIException as a:
@@ -352,7 +349,8 @@ if __name__ == '__main__':
 
     GfyBot = GfycatBot.Bot(VideoBot)
     RiskyClickerBot = RiskyClickerBot(heroku, slave, imgurbot, VideoBot, GfyBot)
-    # comment = RiskyClickerBot.bot.comment(id='dspjd1n')
+    # comment = RiskyClickerBot.bot.comment(id='dswvnpw')
     # parent = comment.parent()
     # RiskyClickerBot.generate_comment(comment, parent)
+
     RiskyClickerBot.browseReddit()
