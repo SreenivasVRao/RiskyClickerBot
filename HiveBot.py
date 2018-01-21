@@ -44,12 +44,13 @@ class Bot:
             else:
                 print('Invalid Image Type')
                 return None
+            predictions = reply['status']['response']['output'][0]['classes']
 
         except:
             print ('Hive.ai API failure')
             return None
 
-        predictions = reply['status']['response']['output'][0]['classes']
+
 
         output = {}
         for each in predictions:
