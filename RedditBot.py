@@ -95,7 +95,6 @@ class RiskyClickerBot:
                 data = reddit_comment.body
             elif root:
                 data = reddit_comment.url
-            print (data)
             regexp = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+[#0-9A-Za-z]+'
             urls = re.findall(regexp, data)
             # Mainly based on https://stackoverflow.com/a/6883094
