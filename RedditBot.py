@@ -142,10 +142,10 @@ class RiskyClickerBot:
 
                 bottom_text = '\n \n ___' + \
                               '\n\n^^*RiskyClickerBot* ^^*v2*' + \
-                              '\n\n ^^Am ^^I ^^broken? ^^Contact ^^/u/PigsDogsAndSheep' + \
+                              ' ^^| [^^Summon ^^me!](http://imgur.com/TsvwFht)' + \
                               ' ^^| [^^Source ^^Code](https://github.com/SreenivasVRao/RiskyClickerBot)' + \
                               ' ^^| [^^How ^^it ^^works](https://medium.com/@sreenivasvrao/introducing-u-riskyclickerbot-22b3d56d1e2a)' + \
-                              '\n\n ^^You ^^can ^^summon ^^me ^^too! [^^Example](http://imgur.com/TsvwFht) '
+                              ' ^^| ^^Made ^^by ^^/u/PigsDogsAndSheep!'
 
                 bot_reply = self.handle_multiline_comment(bot_reply)
                 bot_reply += bottom_text
@@ -348,7 +348,7 @@ if __name__ == '__main__':
 
     GfyBot = GfycatBot.Bot(VideoBot)
     RiskyClickerBot = RiskyClickerBot(heroku, slave, imgurbot, VideoBot, GfyBot)
-    # comment = RiskyClickerBot.bot.comment(id='dswvnpw')
+    # comment = RiskyClickerBot.bot.comment(id='dt6z0c5')
     # parent = comment.parent()
     # RiskyClickerBot.generate_comment(comment, parent)
 
