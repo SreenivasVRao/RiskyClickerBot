@@ -9,7 +9,7 @@ import VideoBot
 import bmemcached
 import SlaveBot
 import GfycatBot
-
+import moviepy.editor as mp
 
 class RiskyClickerBot:
 
@@ -97,6 +97,7 @@ class RiskyClickerBot:
                 data = reddit_comment.url
             regexp = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+[#0-9A-Za-z]+'
             urls = re.findall(regexp, data)
+
             # Mainly based on https://stackoverflow.com/a/6883094
             indices = []
             insert_text = []
@@ -106,6 +107,7 @@ class RiskyClickerBot:
             failures = 0
             for each_url in urls[0:6]:
                 link_type = self.url_analyzer(each_url)
+
                 if link_type is None:
                     failures += 1
                     insert_text.append(' **(Could not process this link.)** ')
@@ -208,15 +210,17 @@ class RiskyClickerBot:
                 status = None
                 message = None
 
-        elif linktype == 'gif':
-            status = None
-            message = None
-            #future work
-
-        elif linktype == 'mp4':
+        elif linktype is 'gif' or linktype is 'mp4':
             filename = 'video.mp4'
 
-            urllib.urlretrieve(link, filename)
+            if linktype is 'gif':
+                urllib.urlretrieve(link, 'test.gif')
+                clip = mp.VideoFileClip("test.gif")
+                clip.write_videofile(filename)
+
+            elif linktype is 'mp4':
+                urllib.urlretrieve(link, filename)
+
             status = {link: self.video_bot.make_prediction(filename)}
 
             if status[link] is not None:
@@ -243,7 +247,7 @@ class RiskyClickerBot:
 
         return status, message
 
-    def generate_comment(self, new_comment, new_parent):
+    def generate_comment(self, new_comment, new_parent, test=True):
         id = None
         botreply = ''
         if not new_comment.is_root:
@@ -255,9 +259,13 @@ class RiskyClickerBot:
 
         try:
             if botreply is not None:
-                new_comment.reply(botreply)
-                id = new_parent.id
-                print ('I made a new comment: reddit.com'+ new_comment.permalink)
+                if not test:
+                    new_comment.reply(botreply)
+                    id = new_parent.id
+                    print ('I made a new comment: reddit.com'+ new_comment.permalink)
+                else:
+                    print (botreply)
+
         except APIException as a:
             print(a.message, a.error_type)
         except prawcore.exceptions.Forbidden as e:
@@ -321,7 +329,7 @@ class RiskyClickerBot:
                 # and if the parent comment is not by this bot
 
                 if parse:
-                    id = self.generate_comment(new_comment=comment, new_parent=parent)
+                    id = self.generate_comment(new_comment=comment, new_parent=parent, test=False)
                     if id is not None:
                         memcache_client.set(parent.id, 'T')
                 else:
@@ -354,8 +362,8 @@ if __name__ == '__main__':
 
     GfyBot = GfycatBot.Bot(VideoBot)
     RiskyClickerBot = RiskyClickerBot(heroku, slave, imgurbot, VideoBot, GfyBot)
-    # comment = RiskyClickerBot.bot.comment(id='dtg77t2')
-    # parent = comment.parent()
-    # RiskyClickerBot.generate_comment(comment, parent)
+    comment = RiskyClickerBot.bot.comment(id='dtg8fmg')
+    parent = comment.parent()
+    RiskyClickerBot.generate_comment(comment, parent)
 
-    RiskyClickerBot.browseReddit()
+    #RiskyClickerBot.browseReddit()
