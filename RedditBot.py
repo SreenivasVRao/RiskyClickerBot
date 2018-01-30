@@ -308,8 +308,8 @@ class RiskyClickerBot:
 
         memcache_client = self.get_memcache_client()
 
-        # subreddit = redditbot.subreddit('all')
-        subreddit = self.bot.subreddit('pythonforengineers')
+        subreddit = redditbot.subreddit('all')
+        #subreddit = self.bot.subreddit('pythonforengineers')
 
         for n, comment in enumerate(subreddit.stream.comments()):
             if 'risky click' in comment.body.lower() or 'r/riskyclick' in comment.body.lower() \
