@@ -217,6 +217,8 @@ class RiskyClickerBot:
                 urllib.urlretrieve(link, 'test.gif')
                 clip = mp.VideoFileClip("test.gif")
                 clip.write_videofile(filename)
+                if os.path.exists('test.gif'):
+                    os.remove('test.gif')
 
             elif linktype is 'mp4':
                 urllib.urlretrieve(link, filename)
