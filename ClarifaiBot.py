@@ -9,7 +9,8 @@ from __future__ import print_function
 from clarifai.rest import ClarifaiApp
 from clarifai.rest import client
 import os
-
+import numpy as np
+from scipy import spatial
 
 class Bot:
 
@@ -17,6 +18,22 @@ class Bot:
         CLARIFAI_API_KEY = os.environ.get("CLARIFAI_API_KEY")
         app = ClarifaiApp(api_key=CLARIFAI_API_KEY)
         self.Detector = app.models.get(model_id='d16f390eb32cad478c7ae150069bd2c6')
+        self.Embed_Model = app.models.get('general-v1.3', model_type='embed')
+
+    def match_template(self, link, template='manning'):
+        try:
+            reply = self.Embed_Model.predict_by_url(url=link)
+            embedding = reply['outputs'][0]['data']['embeddings'][0]['vector']
+            if template is 'manning':
+                manning_template = np.load('embeddings/manning_face_embedding.npy')
+                distance = spatial.distance.cosine(embedding, manning_template)
+            else:
+                distance = 2 #max value returned
+        except client.ApiError:
+            print('Clarifai API failure')
+            return None
+
+        return distance
 
     def get_all_predictions(self, link_list):
         # returns a dictionary key=URL, value = dictionary
@@ -60,6 +77,8 @@ class Bot:
 
 if __name__ == '__main__':
     bot = Bot()
-    link = 'https://i.pinimg.com/736x/69/6e/ca/696ecaa640bad3a0a8b5fbb4398f3b51--medical-pictures-medical-problems.jpg'
-    #print (bot.get_predictions(['http://imgur.com/JlVKy4W.jpg']))
-    print (bot.get_prediction(link, 'url'))
+    link = 'http://i0.kym-cdn.com/photos/images/facebook/001/207/210/b22.jpg'
+
+    print (bot.match_template(link, template='manning'))
+    #print (bot.get_prediction(link, 'url'))
+

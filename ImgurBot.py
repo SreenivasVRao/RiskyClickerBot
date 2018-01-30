@@ -73,6 +73,7 @@ class Bot:
                     elif tag is not 'SFW' and confidence>max_nsfw[1]:
                         max_nsfw = labels[0]
 
+
                 if max_nsfw != (None, 0):
                     message = "Album has "+str(max_nsfw[0])+" image(s). I'm {0:.2f}% confident.".format(max_nsfw[1])
 
@@ -102,8 +103,13 @@ class Bot:
         if len(valid_links) == 1:
             link = valid_links[0]
             labels = sorted(status[link].items(), key=operator.itemgetter(1), reverse=True)
+            tag, confidence = labels[0]
+            message = tag + ". I'm  {0:.2f}% confident.".format(confidence)
+            if tag is 'SFW':
+                manning_distance = self.slave_bot.clarifai_bot.match_template(link, 'manning')
+                if manning_distance is not None and manning_distance <= 0.01:
+                    message += ' Might be Manning Face.'
 
-            message = labels[0][0] + ". I'm  {0:.2f}% confident.".format(labels[0][1])
             message = '**[Hover to reveal](#s "' + message + ' ")**'  # reddit spoiler tag added.
 
         return status, message

@@ -196,7 +196,14 @@ class RiskyClickerBot:
                 tag, confidence = labels[0]
 
                 message = tag + ". I'm  {0:.2f}% confident.".format(confidence)
+
+                if tag is 'SFW':
+                    manning_distance = self.slave_bot.clarifai_bot.match_template(link, 'manning')
+                    if manning_distance is not None and manning_distance <= 0.01:
+                        message += ' Might be Manning Face.'
+
                 message = '**[Hover to reveal](#s "' + message + ' ")**'  # reddit spoiler tag added.
+
             else:
                 status = None
                 message = None
@@ -302,7 +309,7 @@ class RiskyClickerBot:
         memcache_client = self.get_memcache_client()
 
         # subreddit = redditbot.subreddit('all')
-        subreddit = self.bot.subreddit('all')
+        subreddit = self.bot.subreddit('pythonforengineers')
 
         for n, comment in enumerate(subreddit.stream.comments()):
             if 'risky click' in comment.body.lower() or 'r/riskyclick' in comment.body.lower() \
@@ -348,7 +355,7 @@ if __name__ == '__main__':
 
     GfyBot = GfycatBot.Bot(VideoBot)
     RiskyClickerBot = RiskyClickerBot(heroku, slave, imgurbot, VideoBot, GfyBot)
-    # comment = RiskyClickerBot.bot.comment(id='dt6z0c5')
+    # comment = RiskyClickerBot.bot.comment(id='dtg77t2')
     # parent = comment.parent()
     # RiskyClickerBot.generate_comment(comment, parent)
 
